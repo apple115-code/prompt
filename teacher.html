@@ -10,6 +10,8 @@
   <script defer src="prompts.js"></script>
   <script defer src="app.js"></script>
   <script defer src="editor.js"></script>
+  <script defer src="publisher-config.js"></script>
+  <script defer src="publisher.js"></script>
   <script>window.addEventListener("DOMContentLoaded", () => document.querySelector("#open-editor").click());</script>
 </head>
 <body>
@@ -29,7 +31,12 @@
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
   <dialog id="editor" aria-labelledby="editor-title">
     <div class="editor-heading"><h2 id="editor-title">프롬프트 편집</h2><button id="close-editor" class="secondary" type="button">닫기</button></div>
-    <p class="editor-note">저장하면 이 브라우저에만 반영됩니다. 수강생에게도 보이게 하려면 ‘공유용 파일 다운로드’로 받은 prompts.js를 GitHub 저장소에 교체해 주세요. 이 화면은 개인 편집 도구이며 관리자 로그인 기능은 없습니다.</p>
+    <p class="editor-note">‘변경 내용 저장’은 내 브라우저에 초안을 저장합니다. GitHub 로그인 후 ‘수강생에게 게시’를 누르면 공유 페이지가 자동으로 갱신됩니다. 배포가 완료될 때까지 잠시 기다려 주세요.</p>
+    <section class="publisher-panel" aria-label="수강생에게 게시">
+      <div class="editor-buttons"><button id="github-login" class="secondary" type="button">GitHub 로그인</button><button id="github-logout" class="secondary" type="button" hidden>로그아웃</button><button id="publish-prompts" class="copy" type="button" disabled>수강생에게 게시</button></div>
+      <p id="publish-status" role="status" aria-live="polite">GitHub 로그인 연결을 확인하고 있습니다.</p>
+      <a id="publish-result" target="_blank" rel="noopener noreferrer" hidden>수강생 페이지 열기</a>
+    </section>
     <p id="storage-status" role="status"></p>
     <div class="editor-picker"><label for="edit-picker">편집할 프롬프트</label><select id="edit-picker"></select><button id="new-prompt" class="secondary" type="button">+ 새 프롬프트</button></div>
     <form id="edit-form">

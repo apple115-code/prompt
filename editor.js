@@ -1,6 +1,6 @@
 'use strict';
 const storageKey = 'prompt-library-edits-v1';
-const sourcePrompts = JSON.stringify(window.PROMPTS);
+let sourcePrompts = JSON.stringify(window.PROMPTS);
 const editor = document.querySelector('#editor');
 const picker = document.querySelector('#edit-picker');
 const fields = Object.fromEntries(['title', 'description', 'category', 'status', 'text'].map(key => [key, document.querySelector(`#edit-${key}`)]));
@@ -21,7 +21,7 @@ try {
 function persist() {
   try {
     localStorage.setItem(storageKey, JSON.stringify({ base: sourcePrompts, items: window.PROMPTS }));
-    storageStatus('이 브라우저에 저장되었습니다. 다른 기기나 수강생에게는 파일 교체 후 반영됩니다.');
+    storageStatus('이 브라우저에 초안을 저장했습니다. 수강생에게 반영하려면 ‘수강생에게 게시’를 눌러 주세요.');
   } catch (_) {
     storageStatus('브라우저 저장에 실패했습니다. 현재 화면에만 반영됩니다. 닫기 전에 공유용 파일을 다운로드하세요.');
   }
