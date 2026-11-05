@@ -38,7 +38,7 @@ function render() {
   document.querySelector('#clear').hidden = !search.value;
   items.forEach((item, index) => {
     const article = document.createElement('article'); article.className = 'card';
-    const details = document.createElement('details'); details.open = item.id === 'bamboo';
+    const details = document.createElement('details'); details.open = item.id === 'bamboo'; details.dataset.promptId = item.id;
     const summary = document.createElement('summary');
     const meta = document.createElement('span'); meta.className = 'meta';
     const type = document.createElement('span'); type.textContent = item.category === 'model' ? '3D 모델링' : '배경 이미지';
