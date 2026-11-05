@@ -31,7 +31,7 @@
 
 HTML/CSS/JS는 GitHub Pages에서 제공합니다. 로그인과 게시 요청은 본인의 Cloudflare Worker가 처리합니다. 수강생은 외부 로그인 없이 사용할 수 있습니다.
 
-수동 배포 설정: Settings → Pages → Deploy from a branch → main → /(root).
+배포 설정: Settings → Pages → GitHub Actions. main의 페이지·프롬프트 파일이 바뀌면 .github/workflows/publish.yml이 자동 배포합니다.
 
 주요 파일: index.html(수강생 화면), teacher.html(편집 화면), style.css(디자인), app.js(검색·복사), editor.js(초안 편집), publisher.js(로그인·게시), publisher-config.js(인증 서버 주소), prompts.js(게시된 프롬프트).
 
@@ -44,3 +44,5 @@ prompts.js는 window.PROMPTS에 JSON 배열을 대입하는 형식입니다. 편
 - https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
 - https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
 - https://developers.cloudflare.com/workers/
+
+
