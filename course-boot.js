@@ -2,7 +2,7 @@
 (async () => {
   const fresh = path => { const u = new URL(path, location.href); u.searchParams.set('fresh', Date.now() + '-' + Math.random().toString(36).slice(2)); return u.href; };
   const script = path => new Promise((resolve, reject) => { const s = document.createElement('script'); s.src = fresh(path); s.onload = () => { s.remove(); resolve(); }; s.onerror = () => { s.remove(); reject(Error('화면을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.')); }; document.head.append(s); });
-  const read = async () => { if(location.protocol==='file:'){await script('library-data.js');return PromptSchema.validateLibrary(window.LIBRARY);} const r = await fetch(fresh('library.json'), { cache: 'no-store' }); if (!r.ok) throw Error('수업 자료를 불러오지 못했습니다. 잠시 후 새로고침해 주세요.'); return PromptSchema.validateLibrary(await r.json()); };
+  const read = async () => { if(location.protocol==='file:'){await script('library-data.js');return PromptSchema.validateLibrary(window.LIBRARY);} const r = await fetch('https://prompt-library-publisher.pearapple115.workers.dev/api/v3/library', { cache: 'no-store' }); if (!r.ok) throw Error('수업 자료를 불러오지 못했습니다. 잠시 후 새로고침해 주세요.'); return PromptSchema.validateLibrary((await r.json()).library); };
   try {
     await script('library-schema.js'); window.LIBRARY = await read();
     await script('course-app.js');
@@ -18,7 +18,7 @@
       };
       document.querySelector('#refresh-prompts').addEventListener('click', () => refresh(true));
       window.addEventListener('focus', () => refresh()); document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
-      setInterval(() => { if (!document.hidden) refresh(); }, 30000);
+      setInterval(() => { if (!document.hidden) refresh(); }, 5000);
     }
   } catch (error) { const notice = document.querySelector('#load-status'); notice.textContent = error.message; notice.hidden = false; }
 })();
