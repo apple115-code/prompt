@@ -1,28 +1,5 @@
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="가상현실 역량강화 수업을 위한 AI 프롬프트 모음. 원하는 프롬프트를 한 번에 복사하세요.">
-  <title>프롬프트 서가 · 가상현실 역량강화</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="boot.js?v=2"></script>
-</head>
-<body>
-  <header class="topbar"><a href="./" class="brand"><span class="mark" aria-hidden="true">✳</span> 프롬프트 서가</a><span class="course">가상현실 역량강화</span></header>
-  <main>
-    <section class="intro"><p class="eyebrow">우리 수업의 작은 도구함</p><h1>좋은 시작을 만드는<br><span>한 줄의 아이디어.</span></h1><p class="lead">원하는 프롬프트를 찾아 복사하고,<br class="mobile"> 나만의 가상현실을 만들어 보세요.</p><div class="steps"><span>01 찾아보기</span><span aria-hidden="true">→</span><span>02 전체 복사</span><span aria-hidden="true">→</span><span>03 AI에 붙여넣기</span></div></section>
-    <section class="library" aria-label="프롬프트 찾아보기">
-      <label class="search-label" for="search">어떤 프롬프트를 찾으세요?</label>
-      <div class="search-wrap"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="제목, 장소, 프롬프트 내용 검색" autocomplete="off"><button id="clear" type="button" hidden>검색 지우기</button></div>
-      <div class="filters" role="group" aria-label="카테고리"><button type="button" data-category="all" aria-pressed="true">전체</button><button type="button" data-category="background" aria-pressed="false">배경 이미지</button><button type="button" data-category="model" aria-pressed="false">3D 모델링</button></div>
-      <div class="list-heading"><h2>프롬프트 모음</h2><p id="count" role="status"></p><button id="refresh-prompts" class="secondary" type="button">최신 내용 확인</button></div>
-      <div id="cards"></div><div id="empty" hidden><h3>검색 결과가 없어요.</h3><p>다른 검색어를 입력하거나 전체 카테고리를 선택해 보세요.</p><button id="reset" type="button">전체 프롬프트 보기</button></div>
-    </section>
-    <aside class="help"><span aria-hidden="true">↗</span><div><strong>복사한 다음에는?</strong><p>사용할 AI 도구의 입력창에 붙여넣으세요. PC는 Ctrl+V(맥은 ⌘V), 스마트폰은 입력창을 길게 누른 뒤 ‘붙여넣기’를 선택하면 됩니다.</p></div></aside>
-  </main>
-  <footer><span>프롬프트 서가</span><p>아이디어를 복사하고, 가능성을 넓히세요.</p></footer>
-  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-  <noscript><p>프롬프트 검색과 복사를 사용하려면 브라우저에서 JavaScript를 켜 주세요.</p></noscript>
-</body>
-</html>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="수업별 AI 프롬프트 자료실"><title>수업별 프롬프트 자료실 · 프롬프트 서가</title><link rel="stylesheet" href="style.css?v=courses1"><script defer src="course-boot.js?v=1"></script></head><body data-teacher="false"><header class="topbar"><a href="./" class="brand"><span class="mark" aria-hidden="true">✳</span>프롬프트 서가</a><span class="course" id="course-name">수업별 자료실</span></header><main><div class="student-tools"><button id="refresh-prompts" class="secondary" type="button">최신 내용 확인</button></div><section class="intro"><p class="eyebrow">수업별 프롬프트 자료실</p><h1 id="hero-title">수업 자료를 불러오는 중…</h1><p class="lead" id="hero-description"></p></section>
+<p id="load-status" role="alert" hidden></p>
+<section id="course-home"><h2>수업 선택</h2><div id="course-list" class="course-grid"></div><p id="no-courses" hidden>등록된 수업이 없습니다.</p></section>
+<section id="missing-course" hidden><a href="./">전체 수업 보기 →</a></section>
+<section id="course-content" hidden><a class="back-link" href="./">← 전체 수업</a><label class="search-label" for="search">어떤 프롬프트를 찾으세요?</label><div class="search-wrap"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="제목, 설명, 내용 검색"><button id="clear" type="button" hidden>검색 지우기</button></div><div id="course-filters" class="filters" role="group" aria-label="카테고리"></div><div class="list-heading"><h2>프롬프트 모음</h2><p id="count" role="status"></p></div><div id="cards"></div><div id="empty" hidden><h3>프롬프트가 없어요.</h3><p>다른 검색어나 카테고리를 선택해 보세요.</p><button id="reset" class="secondary" type="button">전체 프롬프트 보기</button></div></section><aside class="help"><div><strong>원하는 프롬프트를 전체 복사하세요</strong><p>복사한 뒤 AI 도구의 입력창에 Ctrl+V(맥은 ⌘V), 스마트폰은 길게 눌러 붙여넣으세요.</p></div></aside></main><footer><span>프롬프트 서가</span><p>수업마다 쌓이는 아이디어.</p></footer><div id="toast" class="toast" role="status" aria-live="polite"></div><noscript>JavaScript를 켜 주세요.</noscript></body></html>

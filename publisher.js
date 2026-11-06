@@ -5,7 +5,7 @@
   const publish = document.querySelector('#publish-prompts');
   const status = document.querySelector('#publish-status');
   const resultLink = document.querySelector('#publish-result');
-  const canonical = items => JSON.stringify(items.map(item => Object.fromEntries(['id', 'title', 'description', 'category', 'status', 'text'].map(k => [k, item[k]]))));
+  const canonical = library => JSON.stringify(library);
   let apiOrigin;
   try {
     const url = new URL(window.PUBLISHER_CONFIG?.apiOrigin);
@@ -34,7 +34,7 @@
     }
     return data;
   }
-  status.textContent = 'GitHub에 로그인하면 저장된 프롬프트 전체를 수강생에게 게시할 수 있습니다. 로그인은 이 창을 닫거나 새로고침하면 해제됩니다.';
+  status.textContent = 'GitHub에 로그인하면 저장된 전체 수업을 수강생에게 게시할 수 있습니다. 로그인은 이 창을 닫거나 새로고침하면 해제됩니다.';
   login.addEventListener('click', () => {
     if (busy) return;
     attempt = crypto.randomUUID();
@@ -57,13 +57,13 @@
     if (typeof event.data.session !== 'string') return;
     session = event.data.session; expectedSha = null; busy = true; controls();
     try {
-      const data = await api('/api/session');
-      if (!isValidList(data.items)) throw Error('공유 파일 형식을 확인할 수 없습니다.');
-      if (canonical(data.items) !== baseline) {
+      const data = await api('/api/v2/session');
+      if (!isValidList(data.library)) throw Error('공유 파일 형식을 확인할 수 없습니다.');
+      if (canonical(data.library) !== baseline) {
         throw Error('GitHub에 더 최신 내용이 있습니다. 초안을 다운로드해 보관하고 이 페이지를 새로고침한 뒤 다시 로그인해 주세요.');
       }
       expectedSha = data.sha;
-      status.textContent = `${data.login} 계정으로 로그인했습니다. 초안을 저장한 뒤 ‘수강생에게 게시’를 눌러 주세요.`;
+      status.textContent = `${data.login} 계정으로 로그인했습니다. 전체 수업의 변경 내용을 저장한 뒤 ‘수강생에게 게시’를 눌러 주세요.`;
     } catch (error) { status.textContent = error.message; }
     finally { busy = false; controls(); }
   });
@@ -71,13 +71,13 @@
   async function pollDeployment(commit, started) {
     if (pendingCommit !== commit || !session) return;
     try {
-      const data = await api('/api/deployment?commit=' + encodeURIComponent(commit));
+      const data = await api('/api/v2/deployment?commit=' + encodeURIComponent(commit));
       if (pendingCommit !== commit) return;
       if (data.status === 'completed') {
         pendingCommit = null;
         if (data.conclusion === 'success') {
           status.textContent = '게시 완료! 수강생 페이지에 반영되었습니다. 이미 열어 둔 수강생은 새로고침해 주세요.';
-          resultLink.textContent = '수강생 페이지 열기'; resultLink.href = 'https://apple115-code.github.io/prompt/?v=' + encodeURIComponent(commit);
+          resultLink.textContent = '수강생 페이지 열기'; resultLink.href = 'https://apple115-code.github.io/prompt/?' + (currentCourse() ? 'course=' + encodeURIComponent(activeCourseId) + '&' : '') + 'v=' + encodeURIComponent(commit);
         } else {
           status.textContent = 'GitHub 파일 저장은 완료됐지만 배포가 완료되지 않았습니다. 배포 내역을 확인해 주세요.';
           resultLink.textContent = '배포 내역 확인'; resultLink.href = data.url;
@@ -99,12 +99,12 @@
   publish.addEventListener('click', async () => {
     if (!session || !expectedSha || busy) return;
     if (draftValue() !== draftSnapshot) { status.textContent = '입력 중인 내용을 먼저 ‘변경 내용 저장’으로 저장해 주세요.'; return; }
-    const items = JSON.parse(JSON.stringify(window.PROMPTS));
-    if (!items.length && !window.confirm('모든 프롬프트가 없는 빈 목록을 수강생에게 게시할까요?')) return;
+    const items = JSON.parse(JSON.stringify(window.LIBRARY));
+    if (!items.courses.length && !window.confirm('모든 수업이 없는 빈 자료실을 게시할까요?')) return;
     busy = true; controls(); resultLink.hidden = true;
     status.textContent = 'GitHub에 프롬프트를 저장하고 있습니다. 창을 닫지 말아 주세요.';
     try {
-      const data = await api('/api/publish', { method: 'POST', body: JSON.stringify({ expectedSha, items }) });
+      const data = await api('/api/v2/publish', { method: 'POST', body: JSON.stringify({ expectedSha, library: items }) });
       expectedSha = data.sha; baseline = canonical(items); pendingCommit = data.commit;
       sourcePrompts = JSON.stringify(items);
       persist();
