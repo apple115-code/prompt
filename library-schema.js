@@ -23,5 +23,6 @@
     if (total > 1000 || new TextEncoder().encode(JSON.stringify(data)).length > 1500000) error('자료 용량이 너무 큽니다. 프롬프트는 전체 1,000개까지 지원합니다.');
     return data;
   }
-  root.PromptSchema = { validateLibrary };
+  const canonical = data => JSON.stringify(data, ['version','courses','id','title','description','categories','name','prompts','category','status','text']);
+  root.PromptSchema = { validateLibrary, canonical };
 })(globalThis);

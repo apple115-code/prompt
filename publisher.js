@@ -5,7 +5,7 @@
   const publish = document.querySelector('#publish-prompts');
   const status = document.querySelector('#publish-status');
   const resultLink = document.querySelector('#publish-result');
-  const canonical = library => JSON.stringify(library);
+  const canonical = library => globalThis.PromptSchema.canonical(library);
   let apiOrigin;
   try {
     const url = new URL(window.PUBLISHER_CONFIG?.apiOrigin);
@@ -105,6 +105,14 @@
     status.textContent = 'GitHub에 프롬프트를 저장하고 있습니다. 창을 닫지 말아 주세요.';
     try {
       const data = await api('/api/v2/publish', { method: 'POST', body: JSON.stringify({ expectedSha, library: items }) });
+      if (data.unchanged) {
+        expectedSha = data.sha; baseline = canonical(items); sourcePrompts = JSON.stringify(items); persist();
+        busy = false; pendingCommit = null; controls();
+        status.textContent = '게시된 내용과 동일합니다. 새로 배포할 변경 사항이 없습니다.';
+        const target = new URL('./', location.href); if (activeCourseId) target.searchParams.set('course', activeCourseId); target.searchParams.set('v', Date.now());
+        resultLink.href = target.href; resultLink.textContent = '수강생 페이지 열기'; resultLink.hidden = false;
+        return;
+      }
       expectedSha = data.sha; baseline = canonical(items); pendingCommit = data.commit;
       sourcePrompts = JSON.stringify(items);
       persist();
