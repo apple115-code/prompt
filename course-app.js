@@ -11,20 +11,22 @@ async function copyText(text) {
   const previous = document.activeElement, area = el('textarea'); area.value = text; area.style.cssText = 'position:fixed;opacity:0;top:0;left:0;font-size:16px'; document.body.append(area); area.focus(); area.select(); area.setSelectionRange(0, text.length);
   let copied = false; try { copied = document.execCommand('copy'); } catch (_) {} area.remove(); previous?.focus(); return copied;
 }
-function courseUrl(id) { const u = new URL('./', location.href); u.searchParams.set('course', id); return u.href; }
+function courseUrl() { return new URL('./', location.href).href; }
 function render() {
+  // The first saved course is the teacher's designated student course.
+  // Query parameters never switch the student screen to another course.
+  if (!teacherView) {
+    const designated = window.LIBRARY.courses[0]?.id || null;
+    if (activeCourseId !== designated) { activeCourseId = designated; activeCategory = 'all'; document.querySelector('#search').value = ''; document.querySelector('#cards').dataset.course = ''; }
+  }
   const course = currentCourse();
-  document.querySelector('#course-home').hidden = Boolean(activeCourseId) || teacherView;
+  document.querySelector('#course-home').hidden = true;
   document.querySelector('#course-content').hidden = !course;
-  document.querySelector('#missing-course').hidden = !activeCourseId || Boolean(course) || teacherView;
+  document.querySelector('#missing-course').hidden = Boolean(course) || teacherView;
   document.querySelector('#course-name').textContent = course?.title || (teacherView ? '선생님용 편집' : '수업별 프롬프트 자료실');
-  if (!course && activeCourseId && !teacherView) { document.querySelector('#hero-title').textContent = '수업을 찾을 수 없어요.'; document.querySelector('#hero-description').textContent = '수업이 삭제되었거나 주소가 바뀌었을 수 있어요.'; }
+  if (!course && !teacherView) { document.querySelector('#hero-title').textContent = '수업을 준비하고 있어요.'; document.querySelector('#hero-description').textContent = '선생님이 수업을 게시하면 이곳에 표시됩니다.'; }
   else { document.querySelector('#hero-title').textContent = course?.title || '수업마다, 새로운 아이디어.'; document.querySelector('#hero-description').textContent = course?.description || '참여하는 수업을 선택하고 필요한 프롬프트를 복사하세요.'; }
   const list = document.querySelector('#course-list'); list.replaceChildren();
-  window.LIBRARY.courses.forEach(c => {
-    const link = el('a', undefined, 'course-tile'); link.href = courseUrl(c.id);
-    link.append(el('span', `${c.categories.length}개 카테고리 · ${c.prompts.length}개 프롬프트`, 'eyebrow'), el('h2', c.title), el('p', c.description || '수업 프롬프트를 열어보세요.'), el('span', '수업 열기 →', 'course-open')); list.append(link);
-  });
   document.querySelector('#no-courses').hidden = window.LIBRARY.courses.length > 0;
   if (!course) return;
   document.title = `${course.title} · 프롬프트 서가`;
@@ -51,3 +53,4 @@ document.querySelector('#search').addEventListener('input', render);
 document.querySelector('#clear').addEventListener('click', () => { document.querySelector('#search').value = ''; render(); });
 document.querySelector('#reset').addEventListener('click', () => { document.querySelector('#search').value = ''; activeCategory = 'all'; render(); });
 render();
+document.querySelector('.back-link')?.remove();

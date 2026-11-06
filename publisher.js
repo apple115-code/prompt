@@ -77,7 +77,7 @@
         pendingCommit = null;
         if (data.conclusion === 'success') {
           status.textContent = '게시 완료! 수강생 페이지에 반영되었습니다. 이미 열어 둔 수강생은 새로고침해 주세요.';
-          resultLink.textContent = '수강생 페이지 열기'; resultLink.href = 'https://apple115-code.github.io/prompt/?' + (currentCourse() ? 'course=' + encodeURIComponent(activeCourseId) + '&' : '') + 'v=' + encodeURIComponent(commit);
+          resultLink.textContent = '수강생 페이지 열기'; resultLink.href = 'https://apple115-code.github.io/prompt/?v=' + encodeURIComponent(commit);
         } else {
           status.textContent = 'GitHub 파일 저장은 완료됐지만 배포가 완료되지 않았습니다. 배포 내역을 확인해 주세요.';
           resultLink.textContent = '배포 내역 확인'; resultLink.href = data.url;
@@ -109,7 +109,7 @@
         expectedSha = data.sha; baseline = canonical(items); sourcePrompts = JSON.stringify(items); persist();
         busy = false; pendingCommit = null; controls();
         status.textContent = '게시된 내용과 동일합니다. 새로 배포할 변경 사항이 없습니다.';
-        const target = new URL('./', location.href); if (activeCourseId) target.searchParams.set('course', activeCourseId); target.searchParams.set('v', Date.now());
+        const target = new URL('./', location.href); target.searchParams.set('v', Date.now());
         resultLink.href = target.href; resultLink.textContent = '수강생 페이지 열기'; resultLink.hidden = false;
         return;
       }

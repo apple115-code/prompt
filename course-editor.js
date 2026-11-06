@@ -6,6 +6,11 @@ const makeId = prefix => prefix + '-' + crypto.randomUUID();
 const fields = Object.fromEntries(['title','description','prompt-title','prompt-description','category','status','text'].map(k => [k,document.querySelector('#manage-'+k)]));
 const picker = document.querySelector('#manage-course'), promptPicker = document.querySelector('#manage-prompt');
 const categoryRows = document.querySelector('#category-rows');
+// Older cached teacher HTML can still load the current editor script.
+if(!document.querySelector('#set-student-course')){
+  const select=el('button','이 수업을 수강생에게 표시','copy');select.id='set-student-course';select.type='button';document.querySelector('#copy-course-link').before(select);
+  const status=el('p','','editor-note');status.id='student-course-status';status.setAttribute('role','status');document.querySelector('#storage-status').before(status);
+}
 let editingId = null, draftSnapshot = '';
 const draftValue = () => JSON.stringify({ fields:Object.fromEntries(Object.entries(fields).map(([k,e])=>[k,e.value])), categories:[...categoryRows.children].map(row=>({id:row.dataset.id,name:row.querySelector('input').value})) });
 const isValidList = library => { try { PromptSchema.validateLibrary(library); return true; } catch (_) { return false; } };
@@ -53,6 +58,8 @@ function fillCourse(id){
   if(!course){const opt=el('option','수업을 추가해 주세요');opt.value='';picker.append(opt);}else picker.value=course.id;
   document.querySelector('#course-fields').disabled=!course;
   ['duplicate-course','delete-course','copy-course-link'].forEach(id=>document.querySelector('#'+id).disabled=!course);
+  document.querySelector('#set-student-course').disabled=!course || window.LIBRARY.courses[0]?.id===course.id;
+  document.querySelector('#student-course-status').textContent='수강생에게 표시할 수업: '+(window.LIBRARY.courses[0]?.title||'없음')+' · 변경 후 수강생에게 게시를 눌러 주세요.';
   fields.title.value=course?.title||'';fields.description.value=course?.description||'';categoryRows.replaceChildren();course?.categories.forEach(cat=>categoryRows.append(categoryRow(cat)));
   fillPrompt(course?.prompts[0]?.id);render();
 }
@@ -79,7 +86,13 @@ document.querySelector('#new-course').addEventListener('click',()=>{if(!mayDisca
 document.querySelector('#duplicate-course').addEventListener('click',()=>{if(!mayDiscard())return;const course=currentCourse();if(!course)return;const copy=clone(course);copy.id=makeId('course');copy.title=course.title.slice(0,144)+' (복사)';const next=clone(window.LIBRARY);next.courses.push(copy);try{PromptSchema.validateLibrary(next);}catch(error){errorText(error.message);return;}window.LIBRARY=next;persist();fillCourse(copy.id);showMessage('수업과 프롬프트를 복제했어요.');});
 document.querySelector('#delete-course').addEventListener('click',()=>{const course=currentCourse();if(!course||!window.confirm(`‘${course.title}’ 수업과 프롬프트 ${course.prompts.length}개를 모두 삭제할까요? 아직 게시하지 않은 입력도 사라집니다.`))return;window.LIBRARY.courses=window.LIBRARY.courses.filter(c=>c.id!==course.id);persist();fillCourse();showMessage('수업을 삭제했어요. 게시 전까지 수강생 화면은 유지됩니다.');});
 document.querySelector('#delete-prompt').addEventListener('click',()=>{const course=currentCourse();if(!course||!editingId||!window.confirm('선택한 프롬프트를 삭제할까요? 저장하지 않은 입력도 사라집니다.'))return;course.prompts=course.prompts.filter(p=>p.id!==editingId);persist();fillCourse(course.id);showMessage('프롬프트를 삭제했어요.');});
-document.querySelector('#copy-course-link').addEventListener('click',async()=>{if(!currentCourse())return;const url=courseUrl(activeCourseId);if(await copyText(url))showMessage('이 수업의 수강생 주소를 복사했어요.');else window.prompt('이 주소를 복사해 수강생에게 공유하세요.',url);});
+document.querySelector('#set-student-course').addEventListener('click',()=>{
+  if(draftValue()!==draftSnapshot){errorText('입력 중인 내용을 먼저 변경 내용 저장으로 저장해 주세요.');return;}
+  const course=currentCourse();if(!course)return;const promptId=editingId;
+  window.LIBRARY.courses=[course,...window.LIBRARY.courses.filter(c=>c.id!==course.id)];persist();fillCourse(course.id);fillPrompt(promptId);
+  showMessage('표시할 수업을 지정했어요. 수강생에게 게시를 누르면 적용됩니다.');
+});
+document.querySelector('#copy-course-link').addEventListener('click',async()=>{const url=courseUrl();if(await copyText(url))showMessage('수강생 주소를 복사했어요. 지정해 게시한 수업만 표시됩니다.');else window.prompt('이 주소를 복사해 수강생에게 공유하세요.',url);});
 document.querySelector('#export-library').addEventListener('click',()=>{if(draftValue()!==draftSnapshot){errorText('입력 중인 내용을 먼저 저장해 주세요.');return;}const url=URL.createObjectURL(new Blob([JSON.stringify(window.LIBRARY,null,2)],{type:'application/json;charset=utf-8'})),a=el('a');a.href=url;a.download='prompt-library-backup.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);});
 document.querySelector('#import-library').addEventListener('change',async event=>{const file=event.target.files[0];event.target.value='';if(!file)return;try{if(file.size>1500000)throw Error('백업 파일이 너무 큽니다.');const data=PromptSchema.validateLibrary(JSON.parse(await file.text()));if(!window.confirm('현재 브라우저의 전체 수업과 초안을 이 백업으로 교체할까요? 수강생에게 반영하려면 게시를 눌러야 합니다.'))return;window.LIBRARY=data;persist();fillCourse();showMessage('백업을 불러왔어요.');}catch(error){errorText('백업 불러오기 실패: '+error.message);}});
 fillCourse(activeCourseId);
