@@ -2,18 +2,6 @@
   "version": 2,
   "courses": [
     {
-      "id": "course-826b4ac3-7cdf-4686-8b14-8e62d3c960ea",
-      "title": "연습",
-      "description": "",
-      "categories": [
-        {
-          "id": "general",
-          "name": "일반"
-        }
-      ],
-      "prompts": []
-    },
-    {
       "id": "vr",
       "title": "가상현실 역량강화",
       "description": "배경 이미지와 3D 모델링을 위한 수업용 프롬프트 모음",
